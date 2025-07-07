@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O’Leary-Sant 間質性膀胱炎指數 (ICSI/ICPI)</title>
+    <!-- Chart.js library for creating the trend chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Base body styles for font, line height, margins, background, and text color */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        /* Container for the main content, centered with max-width, padding, border-radius, and shadow */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        /* Styling for headings */
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        /* Main title styling */
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        /* Section heading styling */
+        h2 {
+            margin-top: 30px;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 8px;
+        }
+        /* Introduction text block styling */
+        .intro-text {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+        }
+        /* User identifier section styling */
+        .user-identifier-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #eaf2f8;
+            border: 1px solid #aed6f1;
+            border-radius: 5px;
+        }
+        /* Label for user identifier input */
+        .user-identifier-section label {
+            font-weight: bold;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        /* Input field for user identifier */
+        .user-identifier-section input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+        /* Small text below user identifier input */
+        .user-identifier-section small {
+            display: block;
+            margin-top: 5px;
+            color: #555;
+        }
+        /* Styling for each question group */
+        .question-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #fdfdfd;
+            transition: border-color 0.3s;
+        }
+        /* Highlight for incomplete question groups */
+        .question-group.incomplete-question {
+            border: 2px solid #e74c3c !important;
+            box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+        }
+        /* Styling for question text */
+        .question-group p.question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+        /* Styling for radio button labels */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        /* Hover effect for radio button labels */
+        label:hover {
+            background-color: #ecf0f1;
+        }
+        /* Styling for radio buttons */
+        input[type="radio"] {
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        /* Styling for all buttons */
+        button {
+            display: inline-block;
+            width: auto;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        /* Hover effect for buttons */
+        button:hover {
+            background-color: #2980b9;
+        }
+        /* Specific styling for reset button */
+        button#resetButton {
+            background-color: #e74c3c;
+        }
+        /* Hover effect for reset button */
+        button#resetButton:hover {
+            background-color: #c0392b;
+        }
+        /* Specific styling for clear history button */
+        button#clearHistoryButton {
+            background-color: #95a5a6;
+            font-size: 0.9em;
+            padding: 8px 15px;
+        }
+        /* Hover effect for clear history button */
+        button#clearHistoryButton:hover {
+            background-color: #7f8c8d;
+        }
+        /* Styling for the results section */
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4fd;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+        }
+        /* Heading within results section */
+        .results h3 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        /* Styling for score display lines */
+        .score-display {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        /* Styling for actual score numbers */
+        .score-display span {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 1.2em;
+        }
+        /* Container for the severity score bar */
+        .score-bar-container {
+            display: flex;
+            width: 100%;
+            height: 30px;
+            margin: 15px 0 5px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+        /* Styling for individual segments of the score bar */
+        .score-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        /* Specific colors and widths for each severity segment */
+        .segment-mild { background-color: #90EE90; width: 16.67%; }
+        .segment-light-moderate { background-color: #FFD700; width: 16.67%; color: #333; text-shadow: none;}
+        .segment-moderate-severe { background-color: #FFA500; width: 22.22%; }
+        .segment-severe { background-color: #F08080; width: 44.44%; }
+        /* Highlight effect for the active severity segment */
+        .score-segment.highlighted-segment {
+            transform: scale(1.05);
+            box-shadow: 0 0 8px rgba(0,0,0,0.5) inset;
+            border: 2px solid #fff;
+            z-index: 1;
+            position: relative;
+        }
+        /* Styling for the severity text display */
+        .severity-text-display {
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        /* Specific colors for severity text based on level */
+        .severity-mild { color: #2E8B57; background-color: #e6ffe6; border: 1px solid #90EE90;}
+        .severity-light-moderate { color: #B8860B; background-color: #fff8dc; border: 1px solid #FFD700;}
+        .severity-moderate-severe { color: #CC5500; background-color: #fff0e0; border: 1px solid #FFA500;}
+        .severity-severe { color: #B22222; background-color: #ffe6e6; border: 1px solid #F08080;}
+        /* Container for the trend chart */
+        .trend-chart-container {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #bdc3c7;
+        }
+        /* Styling for interpretation list */
+        .interpretation ul {
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+        /* Styling for interpretation list items */
+        .interpretation li {
+            margin-bottom: 5px;
+        }
+        /* Styling for warning messages (initially hidden) */
+        .warning {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+        /* Styling for the disclaimer text */
+        .disclaimer {
+            margin-top: 40px;
+            font-style: italic;
+            color: #7f8c8d;
+            border-top: 1px dashed #ccc;
+            padding-top: 20px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        /* --- Custom Modal Styles --- */
+        /* Overlay for the modal, covers the whole screen */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top of other content */
+            opacity: 0; /* Initially hidden */
+            visibility: hidden; /* Initially hidden */
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        /* Show modal state */
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Content box of the modal */
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%; /* Responsive width */
+            transform: translateY(-20px); /* Slight animation on show */
+            transition: transform 0.3s ease;
+        }
+        /* Animation for modal content when shown */
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        /* Message text within the modal */
+        .modal-message {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        /* Container for modal buttons */
+        .modal-buttons {
+            display: flex;
+            justify-content: center; /* Center buttons */
+            gap: 15px; /* Space between buttons */
+        }
+        /* Styling for modal buttons, inheriting general button styles but with specific overrides */
+        .modal-buttons button {
+            flex: 1; /* Make buttons take equal width */
+            max-width: 120px; /* Limit max width */
+            margin: 0; /* Remove default button margin */
+            padding: 10px 15px;
+            font-size: 1em;
+        }
+        /* Specific styling for the confirm/yes button in modal */
+        .modal-buttons button.confirm-btn {
+            background-color: #e74c3c; /* Red for destructive action */
+        }
+        .modal-buttons button.confirm-btn:hover {
+            background-color: #c0392b;
+        }
+        /* Specific styling for the cancel/no button in modal */
+        .modal-buttons button.cancel-btn {
+            background-color: #95a5a6; /* Grey for cancel */
+        }
+        .modal-buttons button.cancel-btn:hover {
+            background-color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>O’Leary-Sant 間質性膀胱炎<br>症狀及困擾指數 (ICSI/ICPI)</h1>
+
+        <div class="user-identifier-section">
+            <label for="userIdentifier">使用者識別碼：</label>
+            <input type="text" id="userIdentifier" placeholder="例如：您的暱稱或代號">
+            <small>請輸入一個識別碼以便追蹤您的個人歷史記錄。若留空，記錄將為通用記錄。</small>
+        </div>
+
+        <div class="intro-text">
+            <p>間質性膀胱炎 (Interstitial Cystitis, IC)，也稱為膀胱疼痛症候群 (Bladder Pain Syndrome, BPS)，是一種慢性膀胱疾病，其特徵是膀胱或骨盆區域的疼痛、壓力和不適感，伴隨有尿急和頻尿等泌尿道症狀。O'Leary-Sant 間質性膀胱炎症狀指數 (ICSI) 和困擾指數 (ICPI) 是一個常用的問卷，用於評估 IC/BPS 患者症狀的嚴重程度和對生活的影響程度。</p>
+            <p><strong>請根據您過去一個月的平均情況回答以下問題。</strong></p>
+        </div>
+
+        <form id="icForm">
+            <h2>第一部分：間質性膀胱炎症狀指數 (ICSI)</h2>
+            <p><strong>此部分最高分：20分</strong></p>
+
+            <div class="question-group" data-group-name="icsi_q1_group">
+                <p class="question-text">1. 在過去一個月，您白天感覺到需要排尿的頻率有多高？</p>
+                <label><input type="radio" name="icsi_q1" value="0" required> 0 - 從不</label>
+                <label><input type="radio" name="icsi_q1" value="1"> 1 - 很少 (每天少於1/4的時間)</label>
+                <label><input type="radio" name="icsi_q1" value="2"> 2 - 有時 (每天約1/4的時間)</label>
+                <label><input type="radio" name="icsi_q1" value="3"> 3 - 時常 (每天約一半的時間)</label>
+                <label><input type="radio" name="icsi_q1" value="4"> 4 - 大部分時間 (每天超過一半的時間)</label>
+                <label><input type="radio" name="icsi_q1" value="5"> 5 - 總是 (幾乎整天)</label>
+            </div>
+
+            <div class="question-group" data-group-name="icsi_q2_group">
+                <p class="question-text">2. 在過去一個月，您晚上是否需要起床排尿？</p>
+                <label><input type="radio" name="icsi_q2" value="0" required> 0 - 不需要</label>
+                <label><input type="radio" name="icsi_q2" value="1"> 1 - 每晚1次</label>
+                <label><input type="radio" name="icsi_q2" value="2"> 2 - 每晚2次</label>
+                <label><input type="radio" name="icsi_q2" value="3"> 3 - 每晚3次</label>
+                <label><input type="radio" name="icsi_q2" value="4"> 4 - 每晚4次</label>
+                <label><input type="radio" name="icsi_q2" value="5"> 5 - 每晚5次或以上</label>
+            </div>
+
+            <div class="question-group" data-group-name="icsi_q3_group">
+                <p class="question-text">3. 在過去一個月，您感覺到尿急 (強烈且突然的排尿需求) 的頻率有多高？</p>
+                <label><input type="radio" name="icsi_q3" value="0" required> 0 - 從不</label>
+                <label><input type="radio" name="icsi_q3" value="1"> 1 - 很少</label>
+                <label><input type="radio" name="icsi_q3" value="2"> 2 - 有時</label>
+                <label><input type="radio" name="icsi_q3" value="3"> 3 - 時常</label>
+                <label><input type="radio" name="icsi_q3" value="4"> 4 - 大部分時間</label>
+                <label><input type="radio" name="icsi_q3" value="5"> 5 - 總是</label>
+            </div>
+
+            <div class="question-group" data-group-name="icsi_q4_group">
+                <p class="question-text">4. 在過去一個月，您在膀胱或骨盆區域感覺到疼痛、壓迫感或不適的頻率有多高？</p>
+                <label><input type="radio" name="icsi_q4" value="0" required> 0 - 從不</label>
+                <label><input type="radio" name="icsi_q4" value="1"> 1 - 很少</label>
+                <label><input type="radio" name="icsi_q4" value="2"> 2 - 有時</label>
+                <label><input type="radio" name="icsi_q4" value="3"> 3 - 時常</label>
+                <label><input type="radio" name="icsi_q4" value="4"> 4 - 大部分時間</label>
+                <label><input type="radio" name="icsi_q4" value="5"> 5 - 總是</label>
+            </div>
+
+            <h2>第二部分：間質性膀胱炎困擾指數 (ICPI)</h2>
+            <p><strong>此部分最高分：16分</strong></p>
+
+            <div class="question-group" data-group-name="icpi_q1_group">
+                <p class="question-text">1. 在過去一個月，您的「白天尿頻」對您造成多大的困擾？</p>
+                <label><input type="radio" name="icpi_q1" value="0" required> 0 - 完全沒有問題</label>
+                <label><input type="radio" name="icpi_q1" value="1"> 1 - 非常小的問題</label>
+                <label><input type="radio" name="icpi_q1" value="2"> 2 - 小問題</label>
+                <label><input type="radio" name="icpi_q1" value="3"> 3 - 中等問題</label>
+                <label><input type="radio" name="icpi_q1" value="4"> 4 - 大問題</label>
+            </div>
+
+            <div class="question-group" data-group-name="icpi_q2_group">
+                <p class="question-text">2. 在過去一個月，您的「夜尿」對您造成多大的困擾？</p>
+                <label><input type="radio" name="icpi_q2" value="0" required> 0 - 完全沒有問題</label>
+                <label><input type="radio" name="icpi_q2" value="1"> 1 - 非常小的問題</label>
+                <label><input type="radio" name="icpi_q2" value="2"> 2 - 小問題</label>
+                <label><input type="radio" name="icpi_q2" value="3"> 3 - 中等問題</label>
+                <label><input type="radio" name="icpi_q2" value="4"> 4 - 大問題</label>
+            </div>
+
+            <div class="question-group" data-group-name="icpi_q3_group">
+                <p class="question-text">3. 在過去一個月，您的「尿急感」對您造成多大的困擾？</p>
+                <label><input type="radio" name="icpi_q3" value="0" required> 0 - 完全沒有問題</label>
+                <label><input type="radio" name="icpi_q3" value="1"> 1 - 非常小的問題</label>
+                <label><input type="radio" name="icpi_q3" value="2"> 2 - 小問題</label>
+                <label><input type="radio" name="icpi_q3" value="3"> 3 - 中等問題</label>
+                <label><input type="radio" name="icpi_q3" value="4"> 4 - 大問題</label>
+            </div>
+
+            <div class="question-group" data-group-name="icpi_q4_group">
+                <p class="question-text">4. 在過去一個月，您的「膀胱或骨盆區域的疼痛、壓迫感或不適」對您造成多大的困擾？</p>
+                <label><input type="radio" name="icpi_q4" value="0" required> 0 - 完全沒有問題</label>
+                <label><input type="radio" name="icpi_q4" value="1"> 1 - 非常小的問題</label>
+                <label><input type="radio" name="icpi_q4" value="2"> 2 - 小問題</label>
+                <label><input type="radio" name="icpi_q4" value="3"> 3 - 中等問題</label>
+                <label><input type="radio" name="icpi_q4" value="4"> 4 - 大問題</label>
+            </div>
+
+            <button type="button" onclick="calculateScore()">計算總分</button>
+            <button type="button" id="resetButton" onclick="resetEvaluation()" style="display:none;">重新評分</button>
+            <p id="formWarning" class="warning">請完成所有問題的填寫！未完成的題目已用紅框標示。</p>
+        </form>
+
+        <div class="results" id="resultsSection" style="display:none;">
+            <h3>您的評估結果 (<span id="currentUserIdentifier"></span>)</h3>
+            <div class="score-display">間質性膀胱炎症狀指數 (ICSI) 得分： <span id="icsiScore">0</span> / 20</div>
+            <div class="score-display">間質性膀胱炎困擾指數 (ICPI) 得分： <span id="icpiScore">0</span> / 16</div>
+            <hr>
+            <div class="score-display">總分 (ICSI + ICPI)： <span id="totalScore">0</span> / 36</div>
+
+            <h4>總分嚴重程度：</h4>
+            <div class="score-bar-container">
+                <div class="score-segment segment-mild" data-range="0-5">輕微</div>
+                <div class="score-segment segment-light-moderate" data-range="6-11">輕中度</div>
+                <div class="score-segment segment-moderate-severe" data-range="12-19">中度</div>
+                <div class="score-segment segment-severe" data-range="20-36">重度</div>
+            </div>
+            <p id="severityText" class="severity-text-display"></p>
+
+
+            <div class="interpretation">
+                <h4>分數解釋 (僅供參考):</h4>
+                <ul>
+                    <li><strong>0 - 5 分：</strong> 可能為輕微症狀或無顯著困擾。</li>
+                    <li><strong>6 - 11 分：</strong> 輕度至中度症狀及困擾。</li>
+                    <li><strong>12 - 19 分：</strong> 中度症狀及困擾，建議諮詢專業醫療意見。</li>
+                    <li><strong>20 - 36 分：</strong> 重度症狀及困擾，強烈建議尋求專業醫療協助。</li>
+                </ul>
+                <p><strong>注意：</strong> 此問卷結果不能取代專業醫療診斷。分數越高通常表示症狀越嚴重且對生活造成的困擾越大。如果您對自己的狀況有任何疑慮，請務必諮詢醫生或相關醫療專業人員。</p>
+            </div>
+
+            <div class="trend-chart-container">
+                <h4><span id="chartUserIdentifier"></span> 症狀嚴重程度趨勢圖</h4>
+                <canvas id="trendChart"></canvas>
+                <button type="button" id="clearHistoryButton">清除目前使用者歷史紀錄</button>
+            </div>
+        </div>
+
+
+        <div class="disclaimer">
+            <p><strong>免責聲明：</strong> 此網頁提供的 O’Leary-Sant 間質性膀胱炎指數問卷及結果僅為自我評估參考，不能替代專業的醫療建議、診斷或治療。如果您有任何關於醫療狀況的问题，請務必諮詢您的醫生或其他合格的醫療保健提供者。請勿因在此網頁上閱讀到的資訊而延誤尋求專業醫療建議。</p>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Confirmation -->
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <p id="modalMessage" class="modal-message"></p>
+            <div class="modal-buttons">
+                <button id="modalConfirmBtn" class="confirm-btn">是</button>
+                <button id="modalCancelBtn" class="cancel-btn">否</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let myTrendChart = null; // Variable to hold the Chart.js instance
+        const defaultUser = "通用"; // Default user identifier if none is provided
+
+        /**
+         * Retrieves the user identifier from the input field.
+         * If the input is empty, returns the default user identifier.
+         * @returns {string} The current user identifier.
+         */
+        function getUserIdentifier() {
+            const userId = document.getElementById('userIdentifier').value.trim();
+            return userId === "" ? defaultUser : userId;
+        }
+
+        /**
+         * Generates the localStorage key based on the current user identifier.
+         * This ensures separate history for different users.
+         * @returns {string} The localStorage key for the current user's history.
+         */
+        function getStorageKey() {
+            return `icScoresHistory_${getUserIdentifier()}`;
+        }
+
+        /**
+         * Displays the custom modal with a given message and sets up its button handlers.
+         * @param {string} message - The message to display in the modal.
+         * @returns {Promise<boolean>} A promise that resolves to true if 'Yes' is clicked, false if 'No'.
+         */
+        function showCustomModal(message) {
+            return new Promise(resolve => {
+                const modal = document.getElementById('customModal');
+                const modalMessage = document.getElementById('modalMessage');
+                const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+                const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+                modalMessage.textContent = message;
+                modal.classList.add('show'); // Show the modal
+
+                const handleConfirm = () => {
+                    modal.classList.remove('show');
+                    modalConfirmBtn.removeEventListener('click', handleConfirm);
+                    modalCancelBtn.removeEventListener('click', handleCancel);
+                    resolve(true);
+                };
+
+                const handleCancel = () => {
+                    modal.classList.remove('show');
+                    modalConfirmBtn.removeEventListener('click', handleConfirm);
+                    modalCancelBtn.removeEventListener('click', handleCancel);
+                    resolve(false);
+                };
+
+                modalConfirmBtn.addEventListener('click', handleConfirm);
+                modalCancelBtn.addEventListener('click', handleCancel);
+            });
+        }
+
+        /**
+         * Initializes the application when the window loads.
+         * Loads the last used user identifier and renders the trend chart.
+         * Sets up event listeners for user identifier changes.
+         */
+        window.onload = function() {
+            // Load the last used user identifier from localStorage (if available)
+            const lastUser = localStorage.getItem('lastIcUserIdentifier');
+            if (lastUser) {
+                document.getElementById('userIdentifier').value = lastUser;
+            }
+            renderTrendChart(); // Render chart based on initial user or default
+
+            // Add event listener to re-render chart when user identifier changes
+            document.getElementById('userIdentifier').addEventListener('change', () => {
+                 localStorage.setItem('lastIcUserIdentifier', document.getElementById('userIdentifier').value.trim());
+                 renderTrendChart();
+            });
+            // Add event listener for Enter key on user identifier input
+            document.getElementById('userIdentifier').addEventListener('keyup', (event) => {
+                if (event.key === "Enter") {
+                    localStorage.setItem('lastIcUserIdentifier', document.getElementById('userIdentifier').value.trim());
+                    renderTrendChart();
+                }
+            });
+
+            // Attach event listener for the clear history button
+            document.getElementById('clearHistoryButton').addEventListener('click', clearHistory);
+        };
+
+        /**
+         * Gets the current date in YYYY-MM-DD format.
+         * @returns {string} The formatted current date.
+         */
+        function getCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        /**
+         * Saves the calculated total score along with the current date to localStorage.
+         * Updates existing entry for today or adds a new one.
+         * @param {number} totalScore - The total score to save.
+         */
+        function saveData(totalScore) {
+            const date = getCurrentDate();
+            const storageKey = getStorageKey();
+            let scoresHistory = JSON.parse(localStorage.getItem(storageKey)) || [];
+            
+            // Check if an entry for today already exists
+            const todayEntryIndex = scoresHistory.findIndex(entry => entry.date === date);
+            if (todayEntryIndex > -1) {
+                // Update existing entry
+                scoresHistory[todayEntryIndex].score = totalScore;
+            } else {
+                // Add new entry
+                scoresHistory.push({ date: date, score: totalScore });
+            }
+            // Sort history by date to ensure chronological order for the chart
+            scoresHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+            localStorage.setItem(storageKey, JSON.stringify(scoresHistory));
+        }
+
+        /**
+         * Renders or updates the trend chart using Chart.js.
+         * Displays or hides the chart and clear history button based on data availability.
+         */
+        function renderTrendChart() {
+            const storageKey = getStorageKey();
+            const scoresHistory = JSON.parse(localStorage.getItem(storageKey)) || [];
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            const currentUserForChart = getUserIdentifier();
+            document.getElementById('chartUserIdentifier').textContent = currentUserForChart;
+
+            // Destroy existing chart instance if it exists to prevent memory leaks
+            if (myTrendChart) {
+                myTrendChart.destroy();
+            }
+
+            const chartCanvas = document.getElementById('trendChart');
+            const clearButton = document.getElementById('clearHistoryButton');
+
+            // Hide chart and clear button if no history data
+            if (scoresHistory.length === 0) {
+                 chartCanvas.style.display = 'none';
+                 clearButton.style.display = 'none';
+                return;
+            }
+            // Show chart and clear button if history data exists
+            chartCanvas.style.display = 'block';
+            clearButton.style.display = 'inline-block';
+
+            // Prepare data for the chart
+            const labels = scoresHistory.map(entry => entry.date);
+            const dataPoints = scoresHistory.map(entry => entry.score);
+
+            // Create new Chart.js instance
+            myTrendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `嚴重程度總分 (0-36) - ${currentUserForChart}`,
+                        data: dataPoints,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1, // Smooth the line
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 36, // Max score for the scale
+                            title: { display: true, text: '嚴重程度分數'}
+                        },
+                        x: { 
+                            title: { display: true, text: '日期' }
+                        }
+                    },
+                    plugins: { 
+                        tooltip: { 
+                            callbacks: { 
+                                label: context => `分數: ${context.parsed.y}` // Customize tooltip label
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Calculates the ICSI and ICPI scores, displays results, saves data, and updates the chart.
+         * Also handles form validation for incomplete questions.
+         */
+        function calculateScore() {
+            const form = document.getElementById('icForm');
+            const resultsSection = document.getElementById('resultsSection');
+            const formWarning = document.getElementById('formWarning');
+            const severityTextElement = document.getElementById('severityText');
+            const resetButton = document.getElementById('resetButton');
+            const currentUserDisplay = document.getElementById('currentUserIdentifier');
+
+            // Clear previous incomplete question highlights
+            const allQuestionGroups = form.querySelectorAll('.question-group');
+            allQuestionGroups.forEach(group => group.classList.remove('incomplete-question'));
+
+            let icsiScore = 0;
+            let icpiScore = 0;
+            let allAnswered = true;
+            let firstUnansweredGroup = null; // To scroll to the first unanswered question
+
+            // Define the question sets and their corresponding score variables
+            const questionSets = [
+                { questions: ['icsi_q1', 'icsi_q2', 'icsi_q3', 'icsi_q4'], scoreVar: 'icsiScore' },
+                { questions: ['icpi_q1', 'icpi_q2', 'icpi_q3', 'icpi_q4'], scoreVar: 'icpiScore' }
+            ];
+
+            // Iterate through each question set and calculate scores
+            questionSets.forEach(set => {
+                set.questions.forEach(qName => {
+                    const radioButtons = form.elements[qName];
+                    let groupAnswered = false;
+                    let currentScore = 0;
+
+                    if (radioButtons) {
+                        // Check if a radio button in the group is checked
+                        if (radioButtons.value) { // For single radio buttons or when a value is directly available
+                             currentScore = parseInt(radioButtons.value);
+                             groupAnswered = true;
+                        } else if (radioButtons.length) { // For radio button groups (NodeList)
+                            for (let i = 0; i < radioButtons.length; i++) {
+                                if (radioButtons[i].checked) {
+                                    currentScore = parseInt(radioButtons[i].value);
+                                    groupAnswered = true;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        // Log an error if a question element is not found (shouldn't happen with correct HTML)
+                        console.error(`Element with name ${qName} not found.`);
+                        allAnswered = false; 
+                    }
+
+                    // Find the parent question group div
+                    const questionGroupDiv = document.querySelector(`.question-group[data-group-name="${qName}_group"]`);
+                    if (!groupAnswered && questionGroupDiv) {
+                        allAnswered = false;
+                        questionGroupDiv.classList.add('incomplete-question'); // Add red border
+                        if (!firstUnansweredGroup) {
+                            firstUnansweredGroup = questionGroupDiv; // Store the first unanswered group
+                        }
+                    }
+
+                    // Add score to the correct total
+                    if (set.scoreVar === 'icsiScore') icsiScore += currentScore;
+                    else if (set.scoreVar === 'icpiScore') icpiScore += currentScore;
+                });
+            });
+
+            // If not all questions are answered, show warning and scroll to the first incomplete question
+            if (!allAnswered) {
+                formWarning.style.display = 'block';
+                resultsSection.style.display = 'none';
+                resetButton.style.display = 'none';
+                if (firstUnansweredGroup) {
+                    firstUnansweredGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    formWarning.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            // Hide warning if all questions are answered
+            formWarning.style.display = 'none';
+            const currentUserID = getUserIdentifier();
+            currentUserDisplay.textContent = currentUserID; // Display current user in results
+
+            const totalScore = icsiScore + icpiScore;
+
+            // Update score displays in the results section
+            document.getElementById('icsiScore').textContent = icsiScore;
+            document.getElementById('icpiScore').textContent = icpiScore;
+            document.getElementById('totalScore').textContent = totalScore;
+
+            saveData(totalScore); // Save the current score
+            renderTrendChart(); // Update the trend chart
+
+            // Remove highlight from all score segments
+            const segments = document.querySelectorAll('.score-bar-container .score-segment');
+            segments.forEach(seg => seg.classList.remove('highlighted-segment'));
+
+            let severityDescription = "";
+            let severityClass = "";
+
+            // Determine severity based on total score and highlight the corresponding segment
+            if (totalScore <= 5) {
+                document.querySelector('.score-segment.segment-mild').classList.add('highlighted-segment');
+                severityDescription = "您的症狀及困擾程度屬於：輕微";
+                severityClass = "severity-mild";
+            } else if (totalScore <= 11) {
+                document.querySelector('.score-segment.segment-light-moderate').classList.add('highlighted-segment');
+                severityDescription = "您的症狀及困擾程度屬於：輕中度";
+                severityClass = "severity-light-moderate";
+            } else if (totalScore <= 19) {
+                document.querySelector('.score-segment.segment-moderate-severe').classList.add('highlighted-segment');
+                severityDescription = "您的症狀及困擾程度屬於：中度";
+                severityClass = "severity-moderate-severe";
+            } else {
+                document.querySelector('.score-segment.segment-severe').classList.add('highlighted-segment');
+                severityDescription = "您的症狀及困擾程度屬於：重度";
+                severityClass = "severity-severe";
+            }
+
+            // Update severity text and its styling
+            severityTextElement.textContent = severityDescription;
+            severityTextElement.className = 'severity-text-display'; // Reset classes
+            severityTextElement.classList.add(severityClass); // Add specific severity class
+
+            // Display results section and reset button, then scroll to results
+            resultsSection.style.display = 'block';
+            resetButton.style.display = 'inline-block';
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        /**
+         * Resets the form, hides results, and scrolls to the top of the form.
+         */
+        function resetEvaluation() {
+            document.getElementById('icForm').reset(); // Reset all form inputs
+            // Remove incomplete question highlights
+            const allQuestionGroups = document.querySelectorAll('.question-group');
+            allQuestionGroups.forEach(group => group.classList.remove('incomplete-question'));
+            document.getElementById('resultsSection').style.display = 'none'; // Hide results
+            document.getElementById('resetButton').style.display = 'none'; // Hide reset button
+            document.getElementById('formWarning').style.display = 'none'; // Hide warning
+            // Scroll to the user identifier section
+            window.scrollTo({ top: document.getElementById('userIdentifier').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        /**
+         * Clears the history for the current user after a confirmation via custom modal.
+         */
+        async function clearHistory() {
+            const currentUserID = getUserIdentifier();
+            const message = `您確定要清除使用者 "${currentUserID}" 的所有歷史評分紀錄嗎？此操作無法復原。`;
+            const confirmed = await showCustomModal(message); // Use custom modal for confirmation
+
+            if (confirmed) {
+                localStorage.removeItem(getStorageKey()); // Remove data from localStorage
+                renderTrendChart(); // Re-render chart (will now be empty)
+            }
+        }
+    </script>
+
+</body>
+</html>
+
